@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -7,6 +8,7 @@ namespace CPUFramework
 {
     public class SQLUtility
     {
+
         public static string ConnectionString = "";
         public static DataTable ExecuteSQL(string sqlstatement)
         {
