@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -8,7 +9,6 @@ namespace CPUFramework
 {
     public class SQLUtility
     {
-
         public static string ConnectionString = "";
 
         public static SqlCommand GetSQLCommand(string sprocname)
@@ -52,6 +52,7 @@ namespace CPUFramework
                     }
                 }
             }
+            row.Table.AcceptChanges();
         }
         private static DataTable DoExecuteSQL(SqlCommand cmd, bool loadtable)
         {
@@ -127,6 +128,42 @@ namespace CPUFramework
                 dc.AllowDBNull = true;
             }
         }
+
+        public static int GetValueFromFirstRowAsInt(DataTable dt, string columnname)
+        {
+            int value = 0;
+            if(dt.Rows.Count > 0)
+            {
+                DataRow r = dt.Rows[0];
+                if (r[columnname] != null && r[columnname] is int)
+                {
+                    value = (int)r[columnname];
+                }
+            }
+            return value; 
+        }
+        public static string GetValueFromFirstRowAsString(DataTable dt, string columnname)
+        {
+            string value = "";
+            if (dt.Rows.Count > 0)
+            {
+                DataRow r = dt.Rows[0];
+                if (r[columnname] != null && r[columnname] is string)
+                {
+                    value = (string)r[columnname];
+                }
+            }
+            return value;
+        }
+        public static bool TableHasChanges(DataTable dt)
+        {
+            bool b = false;
+            if(dt.GetChanges() != null)
+            {
+                b = true;
+            }
+            return b; 
+        }
         public static void DebugPringDataTable(DataTable dt)
         {
             foreach (DataRow r in dt.Rows)
@@ -143,10 +180,13 @@ namespace CPUFramework
         }
         public static string ParseConstraintMessage(string msg)
         {
+            //Cannot insert the value NULL into column 'UsersId', table 'HeartyHearthDB.dbo.Recipe'; column does not allow nulls.INSERT fails.
+
             string origmsg = msg;
             string prefix = "ck_";
             string msgend = "";
-            if(msg.Contains(prefix) == false)
+            string notnullprefix = "Cannot insert the value NULL into column '";
+            if (msg.Contains(prefix) == false)
             {
                 if (msg.Contains("u_"))
                 {
@@ -156,6 +196,11 @@ namespace CPUFramework
                 else if (msg.Contains("f_"))
                 {
                     prefix = "f_";
+                }
+                else if (msg.Contains(notnullprefix))
+                {
+                    prefix = notnullprefix;
+                    msgend = " cannot be blank";
                 }
             }
             if (msg.Contains(prefix))
