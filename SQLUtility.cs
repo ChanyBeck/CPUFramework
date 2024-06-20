@@ -18,7 +18,6 @@ namespace CPUFramework
             {
                 cmd = new SqlCommand(sprocname, conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-
                 conn.Open();
                 SqlCommandBuilder.DeriveParameters(cmd);
             }
@@ -28,6 +27,11 @@ namespace CPUFramework
         public static DataTable GetDataTable(SqlCommand cmd) {
             return DoExecuteSQL(cmd, true);
         }
+
+        public static void SaveDataTable(DataTable dt, string sprocname)
+        {
+
+        } 
 
         public static void SaveDataRow(DataRow row, string sprocname)
         {
