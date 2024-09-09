@@ -81,6 +81,17 @@ namespace CPUFramework
                     {
                         dt.Load(dr);
                     }
+                    foreach (SqlParameter p in cmd.Parameters)
+                    {
+                        if (p.Direction == ParameterDirection.InputOutput)
+                        {
+                            string colname = p.ParameterName.Substring(1);
+                            if (dt.Columns.Contains(colname))
+                            {
+                                dt.Rows[0][colname] = p.Value;
+                            }
+                        }
+                    }
                 }
                 catch(SqlException ex)
                 {
