@@ -64,7 +64,10 @@ namespace CPUFramework
         {
             SqlCommand cmd = SQLUtility.GetSQLCommand(_getsproc);
             SQLUtility.SetParameterValue(cmd, "@All", 1);
-            SQLUtility.SetParameterValue(cmd, "@includeblank", includeblank);
+            if (includeblank)
+            {
+                SQLUtility.SetParameterValue(cmd, "@includeblank", includeblank);
+            }
             var dt = SQLUtility.GetDataTable(cmd);
             return this.GetListFromDataTable(dt);
         }
